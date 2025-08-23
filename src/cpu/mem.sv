@@ -50,14 +50,14 @@ module mem (
 );
 
   /* Prepare memory reads. */
-  assign dmem_addr = exec_mem_alu_result;
+  assign dmem_addr  = exec_mem_alu_result;
   assign dmem_wdata = exec_mem_mem_wdata;
   assign dmem_write = exec_mem_mem_w;
-  assign dmem_read = exec_mem_mem_r;
-  assign dmem_rdu = exec_mem_mem_rdu;
-  assign dmem_byte = exec_mem_mem_byte;
-  assign dmem_hwrd = exec_mem_mem_hwrt;
-  assign dmem_wrd = exec_mem_mem_wrd;
+  assign dmem_read  = exec_mem_mem_r;
+  assign dmem_rdu   = exec_mem_mem_rdu;
+  assign dmem_byte  = exec_mem_mem_byte;
+  assign dmem_hwrd  = exec_mem_mem_hwrt;
+  assign dmem_wrd   = exec_mem_mem_wrd;
 
   /* Forward information on to the ext stage. */
   always_ff @(posedge clk) begin

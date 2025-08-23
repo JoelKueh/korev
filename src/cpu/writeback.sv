@@ -17,12 +17,11 @@ module writeback (
     output wire [31:0] regdata,
     output wire [5:0] regno,
     output wire write
-
 );
 
   /* Handle register write. */
-  assign regno = mem_wb_rd;
+  assign regno   = mem_wb_rd;
   assign regdata = mem_wb_data;
-  assign write = mem_wb_writeback;
+  assign write   = mem_wb_writeback;
 
 endmodule

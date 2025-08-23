@@ -93,7 +93,7 @@ module execute (
       ALU_SLL: alu_result = alu_a << (alu_b & 5'b11111);
       ALU_SRL: alu_result = alu_a >> (alu_b & 5'b11111);
       ALU_SRA: alu_result = alu_a >>> (alu_b & 5'b11111);
-      ALU_SLT: alu_result = res_fa[31]; /* check for negative. */
+      ALU_SLT: alu_result = res_fa[31];  /* check for negative. */
       ALU_SLTU: alu_result = $unsigned(alu_a) < $unsigned(alu_b);
     endcase
   end

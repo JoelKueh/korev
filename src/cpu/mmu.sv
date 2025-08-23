@@ -15,10 +15,10 @@ module mmu (
     input wire [31:0] dmem_wdata,
     input wire dmem_write,
     input wire dmem_read,
-    input wire dmem_rdu,    /* Unsigned memory read. */
-    input wire dmem_byte,   /* Byte op size. */
-    input wire dmem_hwrd,   /* Halfword op size. */
-    input wire dmem_wrd,   /* Word op size. */
+    input wire dmem_rdu,  /* Unsigned memory read. */
+    input wire dmem_byte,  /* Byte op size. */
+    input wire dmem_hwrd,  /* Halfword op size. */
+    input wire dmem_wrd,  /* Word op size. */
     output wire dmem_drdy,
     output wire [31:0] dmem_rdata,
 
