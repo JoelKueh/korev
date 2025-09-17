@@ -6,16 +6,17 @@
  */
 module fetch (
     /* General inputs. */
-    input clk,
-    input [31:0] pc,
+    input wire clk,
+    input wire [31:0] pc,
 
     /* Memory interface wires. */
     output wire [31:0] imem_addr,  /* The address we want to read. */
     input  wire        imem_drdy,  /* Asserted when imem_rdata is ready. */
     input  wire [31:0] imem_rdata, /* The data that we read. */
 
-    /* Execute array outputs */
-    output logic [31:0] exec_mem_out
+    /* The fetched instruction. */
+    output logic [31:0] fetch_dec_instr,
+    output logic [31:0] newpc      /* The new pc. */
 );
 
   /* The PC holds the value of the next instruction to be executed. */
@@ -23,7 +24,7 @@ module fetch (
 
   /* Awesome branch predictor. We won't take the branch. */
   always_ff @(posedge clk) begin
-    exec_mem_out <= imem_rdata;
-    pc <= pc + 1;
+    fetch_dec_instr <= imem_rdata;
+    newpc <= pc + 1;
   end
 endmodule
