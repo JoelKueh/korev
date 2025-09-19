@@ -1,4 +1,5 @@
-`timescale 1ns/100ps;
+`timescale 1ns / 100ps
+;
 
 /*
  * Module 'fetchtb'
@@ -37,8 +38,8 @@ module fetchtb ();
   );
 
   /* Instantiate the fetch module. */
-  wire [31:0] fetch_dec_instr = 0;
-  wire [31:0] newpc = 0;
+  wire [31:0] fetch_dec_instr;
+  wire [31:0] newpc;
   fetch i_fetch (
       .clk(clk),
       .pc(pc),
@@ -54,20 +55,16 @@ module fetchtb ();
     pc <= newpc;
   end
 
-  /* Create the clock. */
-  always begin
-    #10 clk = ~clk;
-  end
-
   /* File IO simulation variables. */
   reg [639:0] errmsg;
   string imem_fname;
   string res_fname;
+  string dump_fname;
   int fimem;
   int fres;
 
   /* Simulation variables. */
-  logic [7:0] imem_data;
+  logic [31:0] imem_data;
   logic [31:0] res_data;
   int i = 0;
 
@@ -83,6 +80,15 @@ module fetchtb ();
       $display("ERROR: RES_FILE must be specified in plusargs.");
       $finish;
     end
+
+    if (!$value$plusargs("DUMP_FILE=%s", dump_fname)) begin
+      $display("ERROR: DUMP_FILE must be specified in plusargs.");
+      $finish;
+    end
+
+    /* Create the dumpfile. */
+    $dumpfile(dump_fname);
+    $dumpvars(0, fetchtb);
 
     /* Open the relevant files. */
     fimem = $fopen(imem_fname, "r");
@@ -102,7 +108,10 @@ module fetchtb ();
     while (($fread(
         imem_data, fimem
     )) > 0) begin
-      i_mmu.icache_l1[i++] = imem_data;
+      i_mmu.icache_l1[i++] = imem_data[7:0];
+      i_mmu.icache_l1[i++] = imem_data[15:8];
+      i_mmu.icache_l1[i++] = imem_data[23:16];
+      i_mmu.icache_l1[i++] = imem_data[31:24];
     end
 
     if ($ferror(fimem, errmsg)) begin
@@ -117,9 +126,10 @@ module fetchtb ();
     )) > 0) begin
       /* Switch the clock. */
       clk = ~clk;
+      #1 clk = ~clk;
 
       /* Check the result after 10ns. */
-      #10 if (fetch_dec_instr != res_data) begin
+      #1 if (fetch_dec_instr !== res_data) begin
         $display("FAIL: %x != %x", fetch_dec_instr, res_data);
       end
     end
@@ -128,45 +138,10 @@ module fetchtb ();
       $display("ERROR: failed read with error %s", errmsg);
     end
 
-    /* Read from the result file. */
-    if ($fread(res_data, fres) <= 0) begin
-      if ($ferror(fres, errmsg)) begin
-        $display("ERROR: failed read with error %s", errmsg);
-      end
-      $finish;
-    end
-
-    /* Check the result. */
-    if (fetch_dec_instr != res_data) begin
-      $display("FAIL: %x != %x", fetch_dec_instr, res_data);
-    end
-
     /* Cleanup. */
-    if (fimem != 0 && $fclose(fimem) != 0) begin
-      $display("ERROR: failed to close %s", imem_fname);
-    end
-
-    if (fres != 0 && $fclose(fres) != 0) begin
-      $display("ERROR: failed to close %s", res_fname);
-    end
-  end
-
-  /* Check the fetched instruction against that in the result file. */
-  always_ff @(posedge clk) begin
-    logic [31:0] res_data;
-    int i = 0;
-
-    /* Read from the result file. */
-    if ($fread(res_data, fres) <= 0) begin
-      if ($ferror(fres, errmsg)) begin
-        $display("ERROR: failed read with error %s", errmsg);
-      end
-      $finish;
-    end
-
-    /* Check the result. */
-    if (fetch_dec_instr != res_data) begin
-      $display("FAIL: %x != %x", fetch_dec_instr, res_data);
-    end
+    if (fimem != 0)
+      $fclose(fimem);
+    if (fres != 0)
+      $fclose(fres);
   end
 endmodule

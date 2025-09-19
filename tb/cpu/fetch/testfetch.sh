@@ -22,23 +22,36 @@ fi
 # Takes the path of the case as input (e.g., "./case/03").
 function test() {
 	# Prepare the relevant paths
+	echo ""
 	name=$1
 	path=$(printf "./tb/cpu/fetch/cases/%02d" "$name")
 	imem="$path/imem"
 	res="$path/res"
+	dump="../../output/$path/dump"
 	desc=$(<$path/desc.txt)
 
+	# Create the output file.
+	outdir=$(printf "$path/../../output/%02d" "$name")
+	dump="$outdir/dump"
+	if [ ! -d "$outdir" ]; then
+		mkdir -p "$outdir"
+	fi
+
 	# Run the test case.
-	output=$(./bin/tb/cpu/fetch/Vfetchtb +IMEM_FILE=$imem +RES_FILE=$res |
+	output=$(./bin/tb/cpu/fetch/Vfetchtb \
+		+IMEM_FILE=$imem \
+		+RES_FILE=$res \
+		+DUMP_FILE=$dump | \
 		tee /dev/tty)
 
 	# Check the output.
-	RED='\033[0;31m'
-	NC='\033[0m'
-	if [ -n "$output" ]; then
-		echo "[${RED}PASS${NC}] - $desc"
+	RED="\033[1;31m"
+	GREEN="\033[1;32m"
+	NC="\033[0m"
+	if echo "$output" | grep -i -e "FAIL" -e "ERROR" ; then
+		echo -e "[${RED}FAIL${NC}] - $desc"
 	else
-		echo "[${RED}FAIL${NC}] - $desc"
+		echo -e "[${GREEN}PASS${NC}] - $desc"
 	fi
 }
 

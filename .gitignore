@@ -1,2 +1,4 @@
 obj_dir/
 bin/
+instructions.ods
+tb/*/output/*

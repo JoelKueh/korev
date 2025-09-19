@@ -1,0 +1,130 @@
+$date
+	Fri Sep 19 07:50:47 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	100ps
+$end
+$scope module fetchtb $end
+$var wire 1 ! mmu_imem_drdy $end
+$var wire 32 " newpc [31:0] $end
+$var wire 32 # mmu_imem_rdata [31:0] $end
+$var wire 32 $ mmu_imem_addr [31:0] $end
+$var wire 32 % fetch_dec_instr [31:0] $end
+$var reg 1 & clk $end
+$var reg 640 ' errmsg [639:0] $end
+$var reg 8 ( imem_data [7:0] $end
+$var reg 32 ) pc [31:0] $end
+$var reg 32 * res_data [31:0] $end
+$var integer 32 + fimem [31:0] $end
+$var integer 32 , fres [31:0] $end
+$var integer 32 - i [31:0] $end
+$scope module i_fetch $end
+$var wire 1 & clk $end
+$var wire 32 . imem_addr [31:0] $end
+$var wire 1 ! imem_drdy $end
+$var wire 32 / pc [31:0] $end
+$var wire 32 0 newpc [31:0] $end
+$var wire 32 1 imem_rdata [31:0] $end
+$var reg 32 2 fetch_dec_instr [31:0] $end
+$upscope $end
+$scope module i_mmu $end
+$var wire 1 & clk $end
+$var wire 32 3 dmem_addr [31:0] $end
+$var wire 1 4 dmem_drdy $end
+$var wire 1 5 dmem_hwrd $end
+$var wire 32 6 dmem_rdata [31:0] $end
+$var wire 1 7 dmem_rdu $end
+$var wire 1 8 dmem_read $end
+$var wire 32 9 dmem_wdata [31:0] $end
+$var wire 1 : dmem_wrd $end
+$var wire 1 ; dmem_write $end
+$var wire 32 < imem_addr [31:0] $end
+$var wire 1 ! imem_drdy $end
+$var wire 32 = imem_rdata [31:0] $end
+$var wire 32 > dmem_rd_wrd [31:0] $end
+$var wire 32 ? dmem_rd_hwrd [31:0] $end
+$var wire 32 @ dmem_rd_byte [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+bx @
+bx ?
+bx >
+b111111111111111111111111 =
+b1 <
+z;
+z:
+bz 9
+z8
+z7
+bx 6
+z5
+14
+bz 3
+b11111111111111111111111111111111 2
+b111111111111111111111111 1
+b10 0
+b1 /
+b1 .
+b0 -
+b10000000000000000000000000000100 ,
+b10000000000000000000000000000011 +
+b11111111111111111111111111111111 *
+b1 )
+b100001 (
+b0 '
+1&
+b11111111111111111111111111111111 %
+b1 $
+b111111111111111111111111 #
+b10 "
+1!
+$end
+#10
+0&
+b0 *
+#20
+b1111111111111111 #
+b1111111111111111 1
+b1111111111111111 =
+b10 $
+b10 .
+b10 <
+b11 "
+b11 0
+b10 )
+b10 /
+b111111111111111111111111 %
+b111111111111111111111111 2
+1&
+b10010001101000101011001111000 *
+#30
+0&
+b10001000100010001000100010001000 *
+#40
+b1111111111111111 %
+b1111111111111111 2
+b11111111 #
+b11111111 1
+b11111111 =
+b11 $
+b11 .
+b11 <
+b100 "
+b100 0
+b11 )
+b11 /
+1&
+b10011001100110011001100110011001 *
+#50
+0&
+b10000111011001010100001100100001 *
+#60

@@ -34,7 +34,7 @@ module mmu (
   /* Define main memory. */
   reg [7:0] memory[`MEM_SIZE];
 
-`ifdef MMU_SIMPLE
+//`ifdef MMU_SIMPLE
   /* Handle data memory writes. These must be synchronous on the clock. */
   always_ff @(posedge clk) begin
     /* Handle byte write. */
@@ -79,14 +79,14 @@ module mmu (
 
   /* Handle imem reads. */
   assign imem_rdata = {
-    {icache_l1[imem_addr + 3]},
-    {icache_l1[imem_addr + 2]},
-    {icache_l1[imem_addr + 1]},
-    {icache_l1[imem_addr]}
+    {icache_l1[(imem_addr << 2) + 3]},
+    {icache_l1[(imem_addr << 2) + 2]},
+    {icache_l1[(imem_addr << 2) + 1]},
+    {icache_l1[(imem_addr << 2)]}
   };
   assign imem_drdy = 1'b1;
-`else
-  /* TODO: Create the complex multi-level cache system. */
-`endif
+//`else
+//  /* TODO: Create the complex multi-level cache system. */
+//`endif
 
 endmodule

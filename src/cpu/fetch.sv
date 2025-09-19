@@ -16,15 +16,15 @@ module fetch (
 
     /* The fetched instruction. */
     output logic [31:0] fetch_dec_instr,
-    output logic [31:0] newpc      /* The new pc. */
+    output wire [31:0] newpc       /* The new pc. */
 );
 
   /* The PC holds the value of the next instruction to be executed. */
   assign imem_addr = pc;
+  assign newpc = pc + 1;
 
   /* Awesome branch predictor. We won't take the branch. */
   always_ff @(posedge clk) begin
     fetch_dec_instr <= imem_rdata;
-    newpc <= pc + 1;
   end
 endmodule
