@@ -1,3 +1,4 @@
+`timescale 1ns/100ps;
 
 /*
  * Module 'fetchtb'
@@ -55,8 +56,7 @@ module fetchtb ();
 
   /* Create the clock. */
   always begin
-    #10
-    clk = ~clk;
+    #10 clk = ~clk;
   end
 
   /* File IO simulation variables. */
@@ -66,11 +66,13 @@ module fetchtb ();
   int fimem;
   int fres;
 
+  /* Simulation variables. */
+  logic [7:0] imem_data;
+  logic [31:0] res_data;
+  int i = 0;
+
   /* Load the resuource files for the fetch test. */
   initial begin
-    logic [7:0] imem_data;
-    int i = 0;
-
     /* Check if the proper args were supplied. */
     if (!$value$plusargs("IMEM_FILE=%s", imem_fname)) begin
       $display("ERROR: IMEM_FILE must be specified in plusargs.");
@@ -108,18 +110,45 @@ module fetchtb ();
       $finish;
     end
 
-    /* Start reading from 
-  end
+    /* Start reading from the result file. */
+    i = 0;
+    while (($fread(
+        res_data, fres
+    )) > 0) begin
+      /* Switch the clock. */
+      clk = ~clk;
 
-  /* Cleanup. */
-  final begin
-    //if (fimem != 0 && $fclose(fimem) != 0) begin
-    //  $display("ERROR: failed to close %s", imem_fname);
-    //end
+      /* Check the result after 10ns. */
+      #10 if (fetch_dec_instr != res_data) begin
+        $display("FAIL: %x != %x", fetch_dec_instr, res_data);
+      end
+    end
 
-    //if (fres != 0 && $fclose(fres) != 0) begin
-    //  $display("ERROR: failed to close %s", res_fname);
-    //end
+    if ($ferror(fres, errmsg)) begin
+      $display("ERROR: failed read with error %s", errmsg);
+    end
+
+    /* Read from the result file. */
+    if ($fread(res_data, fres) <= 0) begin
+      if ($ferror(fres, errmsg)) begin
+        $display("ERROR: failed read with error %s", errmsg);
+      end
+      $finish;
+    end
+
+    /* Check the result. */
+    if (fetch_dec_instr != res_data) begin
+      $display("FAIL: %x != %x", fetch_dec_instr, res_data);
+    end
+
+    /* Cleanup. */
+    if (fimem != 0 && $fclose(fimem) != 0) begin
+      $display("ERROR: failed to close %s", imem_fname);
+    end
+
+    if (fres != 0 && $fclose(fres) != 0) begin
+      $display("ERROR: failed to close %s", res_fname);
+    end
   end
 
   /* Check the fetched instruction against that in the result file. */
