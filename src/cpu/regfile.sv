@@ -6,22 +6,28 @@
  */
 module regfile (
     input wire clk,
-    input wire [31:0] regdata_i,
-    input wire [5:0] regno,
+
+    /* Write port. */
+    input wire [31:0] regdata_w,
+    input wire [5:0] regno_w,
     input wire write,
-    output wire [31:0] regdata_o
+
+    /* Read port. */
+    input wire [31:0] regdata_r,
+    input wire [5:0] regno_r
 );
 
   logic [31:0] regs[31];
 
-  /* Write on the falling edge of the clock. */
-  always_ff @(negedge clk) begin
+  /* Read. If the regno_w and regno_r are the same, bypass the regfile. */
+  assign regdata_r = regno_w == regno_r ?
+    regdata_w : regs[regno_r];
+
+  /* Write on the positive edge of the clock. */
+  always_ff @(posedge clk) begin
     if (write) begin
-      regs[regno] <= regdata_i;
+      regs[regno_w] <= regdata_w;
     end
   end
-
-  /* Read continuously. Read valid on the rising edge of the clock. */
-  assign regdata_o = regs[regno];
 
 endmodule
