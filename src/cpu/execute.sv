@@ -11,10 +11,20 @@ module execute (
     /* Alu Operation. */
     input [4:0] dec_exec_alu_op,
 
-    /* Register numbers for forwarding. */
+    /* Forwarding paths. */
     input [5:0] dec_exec_rs1,
     input [5:0] dec_exec_rs2,
+    output [5:0] exec_mem_rd,
+    input [5:0] mem_wb_rd,
+
+    /* alu_b forwarding path. */
+    input [5:0] dec_exec_rs2,
+    input [5:0] exec_mem_rs2,
+    input [5:0] mem_wb_rs2,
     input [5:0] dec_exec_rd,
+
+    /* Forwarding paths. */
+    input [31:0] mem_exec_forward,  /* Mem-Ex forwarding path. */
 
     /* Alu input control signals. */
     input dec_exec_alu_pcsrc,    /* Source alu_a from the pc? */
@@ -74,7 +84,9 @@ module execute (
   end
 
   /* Mux out inputs to alu */
-  wire [31:0] alu_a = dec_exec_alu_pcsrc ? dec_exec_pc : dec_exec_rs1dat;
+  wire [31:0] alu_a = dec_exec_alu_pcsrc ? dec_exec_pc :
+    dec_exec_rs1 == exec_mem_rs1 ? exec_mem_alu_result :
+    dec_exec_rs1 == exec_mem_rs1 ? 
   wire [31:0] alu_b = dec_exec_alu_immsrc ? dec_exec_imm : dec_exec_rs2dat;
 
   /* Shared FA for add, sub, sll, sge, etc... */

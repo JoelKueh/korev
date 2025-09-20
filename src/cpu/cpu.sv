@@ -6,7 +6,8 @@
  */
 module cpu;
   /* Define registers. */
-  logic [31:0] regfile[32];
   logic [31:0] pc;
+
+  /* Define the regfile module. */
 
 endmodule
