@@ -1,24 +1,21 @@
 `timescale 1ns / 100ps;
 
-/*
- * Module 'fetchtb'
- *
- * Testbench for the fetch stage of the CPU.
- */
+// Module 'fetchtb'
+// Testbench for the fetch stage of the CPU.
 module fetchtb ();
-  /* Wires, registers. */
+  // Wires, registers.
   logic clk = 0;
   logic [31:0] pc = 31'b0;
 
-  /* Instantiate the whole mmu. We only need the program memory. */
+  // Instantiate the whole mmu. We only need the program memory.
   wire [31:0] mmu_imem_addr;
   wire mmu_imem_drdy;
   wire [31:0] mmu_imem_rdata;
   mmu i_mmu (
       .clk(clk),
 
-      /* No need for data memory. */
-      /* verilator lint_off PINCONNECTEMPTY */
+      // No need for data memory.
+      // verilator lint_off PINCONNECTEMPTY
       .dmem_addr (),
       .dmem_wdata(),
       .dmem_write(),
@@ -28,15 +25,15 @@ module fetchtb ();
       .dmem_wrd  (),
       .dmem_drdy (),
       .dmem_rdata(),
-      /* verilator lint_on PINCONNECTEMPTY */
+      // verilator lint_on PINCONNECTEMPTY
 
-      /* Wire up the instruction memory. */
+      // Wire up the instruction memory.
       .imem_addr (mmu_imem_addr),
       .imem_drdy (mmu_imem_drdy),
       .imem_rdata(mmu_imem_rdata)
   );
 
-  /* Instantiate the fetch module. */
+  // Instantiate the fetch module.
   wire [31:0] fetch_dec_instr;
   wire [31:0] newpc;
   fetch i_fetch (
@@ -49,12 +46,12 @@ module fetchtb ();
       .newpc(newpc)
   );
 
-  /* Update the pc from the newpc. */
+  // Update the pc from the newpc.
   always_ff @(posedge clk) begin
     pc <= newpc;
   end
 
-  /* File IO simulation variables. */
+  // File IO simulation variables.
   reg [639:0] errmsg;
   string imem_fname;
   string res_fname;
@@ -62,14 +59,14 @@ module fetchtb ();
   int fimem;
   int fres;
 
-  /* Simulation variables. */
+  // Simulation variables.
   logic [31:0] imem_data;
   logic [31:0] res_data;
   int i = 0;
 
-  /* Load the resuource files for the fetch test. */
+  // Load the resuource files for the fetch test.
   initial begin
-    /* Check if the proper args were supplied. */
+    // Check if the proper args were supplied.
     if (!$value$plusargs("IMEM_FILE=%s", imem_fname)) begin
       $display("ERROR: IMEM_FILE must be specified in plusargs.");
       $finish;
@@ -85,11 +82,11 @@ module fetchtb ();
       $finish;
     end
 
-    /* Create the dumpfile. */
+    // Create the dumpfile.
     $dumpfile(dump_fname);
     $dumpvars(0, fetchtb);
 
-    /* Open the relevant files. */
+    // Open the relevant files.
     fimem = $fopen(imem_fname, "r");
     if (fimem == 0) begin
       $display("ERROR: could not open %s", imem_fname);
@@ -102,7 +99,7 @@ module fetchtb ();
       $finish;
     end
 
-    /* Initialize program memory from the data file. */
+    // Initialize program memory from the data file.
     i = 0;
     while (($fread(
         imem_data, fimem
@@ -118,16 +115,16 @@ module fetchtb ();
       $finish;
     end
 
-    /* Start reading from the result file. */
+    // Start reading from the result file.
     i = 0;
     while (($fread(
         res_data, fres
     )) > 0) begin
-      /* Switch the clock. */
+      // Switch the clock.
       clk = ~clk;
       #1 clk = ~clk;
 
-      /* Check the result after 10ns. */
+      // Check the result after 10ns.
       #1 if (fetch_dec_instr !== res_data) begin
         $display("FAIL: %x != %x", fetch_dec_instr, res_data);
       end
@@ -137,7 +134,7 @@ module fetchtb ();
       $display("ERROR: failed read with error %s", errmsg);
     end
 
-    /* Cleanup. */
+    // Cleanup.
     if (fimem != 0)
       $fclose(fimem);
     if (fres != 0)
