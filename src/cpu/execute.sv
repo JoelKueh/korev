@@ -85,8 +85,7 @@ module execute (
 
   /* Mux out inputs to alu */
   wire [31:0] alu_a = dec_exec_alu_pcsrc ? dec_exec_pc :
-    dec_exec_rs1 == exec_mem_rs1 ? exec_mem_alu_result :
-    dec_exec_rs1 == exec_mem_rs1 ? 
+    dec_exec_rs1 == exec_mem_rs1 ? exec_mem_alu_result : exec_mem_rs1dat;
   wire [31:0] alu_b = dec_exec_alu_immsrc ? dec_exec_imm : dec_exec_rs2dat;
 
   /* Shared FA for add, sub, sll, sge, etc... */
