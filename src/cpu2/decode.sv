@@ -7,8 +7,8 @@ module decode (
     input i_clk,
 
     // Data from the fetch stage.
-    input [31:0] i_ftch_dec_instr,
-    input [31:0] i_ftch_dec_pc,
+    input [31:0] i_fetch_dec_instr,
+    input [31:0] i_fetch_dec_pc,
 
     // Register File Interface
     output wire [ 5:0] o_rs1_no,
@@ -49,12 +49,11 @@ module decode (
     output logic b_dec_exec_bonz,    // Branch on zero?
 
     // Mem interface control signals.
-    output logic b_dec_exec_mem_w,  // Write to memory?
-    output logic b_dec_exec_mem_r,  // Read from memory?
-    output logic b_dec_exec_mem_ru,  // Unsigned memory read?
-    output logic b_dec_exec_mem_byte,  // Byte op size?
-    output logic b_dec_exec_mem_hwrd,  // Halfword op size?
-    output logic b_dec_exec_mem_wrd  // Word op size?
+    output logic b_dec_exec_mem_w,    // Write to memory?
+    output logic b_dec_exec_mem_r,    // Read from memory?
+    output logic b_dec_exec_mem_rdu,   // Unsigned memory read?
+    output logic b_dec_exec_mem_byte, // Byte op size?
+    output logic b_dec_exec_mem_hwrd  // Halfword op size?
 );
 
   // Pick apart instruction fields.
@@ -87,9 +86,6 @@ module decode (
     b_dec_exec_funct7 <= fetch_dec_instr[31:25];
     b_dec_exec_funct3 <= fetch_dec_instr[14:12];
   end
-
-  // Assign the immediate and register data right away.
-  // With only the opcode, we can determine the alu op.
 
   // Prepare the proper control signals for the operation.
   logic alu_op;
@@ -373,7 +369,23 @@ module decode (
 
   // Assign control signals to output buffers.
   always_ff @(posedge i_clk) begin
-    b_dec_exec_mem_w
+    b_dec_exec_alu_pcsrc <= alu_pcsrc;
+    b_dec_exec_alu_immsrc <= alu_immsrc;
+    b_dec_exec_jump_rs1src <= jump_rs1src;
+    b_dec_exec_writeback <= writeback;
+
+    // Branch control signals.
+    b_dec_exec_link <= link;
+    b_dec_exec_jump <= jump;
+    b_dec_exec_branch <= branch;
+    b_dec_exec_bonz <= bonz;
+
+    // Mem interface control signals.
+    b_dec_exec_mem_w <= mem_w;
+    b_dec_exec_mem_r <= mem_r;
+    b_dec_exec_mem_rdu <= mem_rdu;
+    b_dec_exec_mem_byte <= mem_byte;
+    b_dec_exec_mem_hwrd <= mem_hwrd;
   end
 
 endmodule
