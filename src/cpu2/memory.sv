@@ -44,6 +44,8 @@ module memory (
 
     // Outputs to writeback stage.
     output logic        b_mem_wb_writeback,  // Should we write to registers.
+    output logic        b_mem_wb_mem_addr,
+    output logic [31:0] b_mem_wb_mem_data,      // The data read from memory.
     output logic [31:0] b_mem_wb_data,       // The data to write.
     output logic [ 5:0] b_mem_wb_rd          // The register to write to.
 );

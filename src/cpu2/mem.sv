@@ -21,7 +21,6 @@ module mem #(
 
     // Dmem R/W Port
     input wire i_dmem_write,
-    input wire i_dmem_rdu,
     input wire i_dmem_byte,
     input wire i_dmem_hwrd,
     input wire [31:0] i_dmem_addr,
@@ -40,9 +39,9 @@ module mem #(
   // Prepare byte write enable signals.
   logic [3:0] bwe;
   always_comb begin
-    if (i_dmem_op_byte) begin
+    if (i_dmem_byte) begin
       bwe[i_dmem_addr[1:0]] = 1'b1;
-    end else if (i_dmem_op_hwrd) begin
+    end else if (i_dmem_hwrd) begin
       bwe[{i_dmem_addr[1], 1'b0}] = 1'b1;
       bwe[{i_dmem_addr[1], 1'b1}] = 1'b1;
     end else begin
@@ -60,27 +59,6 @@ module mem #(
       if (bwe[3]) memory[i_dmem_addr>>2][31:24] <= i_dmem_wdata[31:24];
     end else begin
       dmem_rdata <= memory[i_dmem_addr>>2];
-    end
-  end
-
-  // Shift output into the right spot for byte-wide reads.
-  logic sext_bit;
-  logic [15:0] dmem_shifted;
-  logic [31:0] regdata;
-  always_comb begin
-    if (i_dmem_op_byte) begin
-      // Fix input data for byte-wide reads.
-      dmem_shifted = o_dmem_rdata >> i_dmem_addr[1:0];
-      sext_bit = i_dmem_rdu ? 1'b0 : dmem_shifted[7];
-      o_dmem_result = {{24{sext_bit}}, dmem_shifted[7:0]};
-    end else if (i_dmem_op_hwrd) begin
-      // Fix input data for half-word-wide reads.
-      dmem_shifted = o_dmem_rdata >> {i_dmem_addr[1], 1'b0};
-      sext_bit = i_dmem_rdu ? 1'b0 : dmem_shifted[15];
-      o_dmem_result = {{16{sext_bit}}, dmem_shifted[15:0]};
-    end else begin
-      // Otherwise just output the data as it is.
-      o_dmem_result = o_mem_wb_data;
     end
   end
 

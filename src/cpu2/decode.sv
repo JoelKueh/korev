@@ -161,7 +161,7 @@ module decode (
       riscv_instr::BGEU: begin
         // B-Type - Sltu and branch on false.
         alu_op = ALU_SLTU;
-        branch = 1'b1;
+        branch = 1'b1;everybody will be down after that, so you have some time until then if there was something else you needed to do
         bonz   = 1'b1;
       end
       riscv_instr::BLT: begin
