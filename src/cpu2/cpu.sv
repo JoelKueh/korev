@@ -178,12 +178,80 @@ module cpu (
   );
 
   // MEMORY
+  wire [31:0] mem_mem_forward;
+
+  wire [31:0] mem_dmem_addr;
+  wire [31:0] mem_dmem_wdata;
+  wire mem_dmem_write;
+  wire mem_dmem_read;
+  wire mem_dmem_rdu;
+  wire mem_dmem_byte;
+  wire mem_dmem_hwrd;
+  wire mem_dmem_rdata;
+
+  wire mem_wb_writeback;
+  wire mem_wb_mem_addr;
+  wire mem_wb_mem_data;
+  wire mem_wb_wb_data;
+  wire mem_wb_rd;
   memory inst_memory (
       .i_clk(i_clk),
 
       .i_exec_mem_rs1(exec_mem_rs1),
       .i_exec_mem_rs2(exec_mem_rs2),
       .i_exec_mem_rd(exec_mem_rd),
+      .i_exec_mem_wb_rd(mem_wb_rd),
+
+      .i_mem_mem_forward(mem_mem_forward),
+
+      .i_exec_mem_bta(exec_mem_bta),
+      .i_exec_mem_branch_taken(exec_mem_branch_taken),
+
+      .i_exec_mem_writeback(exec_mem_writeback),
+      .i_exec_mem_link(exec_mem_link),
+      .i_exec_mem_mem_w(exec_mem_w),
+      .i_exec_mem_mem_r(exec_mem_r),
+      .i_exec_mem_mem_rdu(exec_mem_mem_rdu),
+      .i_exec_mem_mem_byte(exec_mem_mem_byte),
+      .i_exec_mem_mem_hwrd(exec_mem_mem_hwrd),
+
+      .i_exec_mem_alu_result(exec_mem_alu_result),
+      .i_exec_mem_mem_wdata (exec_mem_mem_wdata),
+
+      .o_dmem_addr (mem_dmem_addr),
+      .o_dmem_wdata(mem_dmem_wdata),
+      .o_dmem_write(mem_dmem_write),
+      .o_dmem_read (mem_dmem_read),
+      .o_dmem_rdu  (mem_dmem_rdu),
+      .o_dmem_byte (mem_dmem_byte),
+      .o_dmem_hwrd (mem_dmem_hwrd),
+      .i_dmem_rdata(mem_dmem_rdata),
+
+      .b_mem_wb_writeback(mem_wb_writeback),
+      .b_mem_wb_mem_addr(mem_wb_mem_addr),
+      .b_mem_wb_mem_data(mem_wb_mem_data),
+      .b_mem_wb_data(mem_wb_data),
+      .b_mem_wb_rd(mem_wb_rd)
+  );
+
+  // WRITEBACK
+  wire wb_rfile_write;
+  wire [31:0] wb_rfile_data;
+  wire [5:0] wb_rfile_regno;
+  writeback inst_writeback (
+      .i_clk(i_clk),
+
+      .i_mem_wb_writeback(mem_wb_writeback),
+      .i_mem_wb_mem_r(mem_wb_mem_r),
+      .i_mem_wb_mem_rdu(mem_wb_mem_rdu),
+      .i_mem_wb_mem_addr(mem_wb_mem_addr),
+      .i_mem_wb_mem_data(mem_wb_mem_data),
+      .i_mem_wb_alu_result(mem_wb_alu_result),
+      .i_mem_wb_rd(mem_wb_rd),
+
+      .o_write(wb_rfile_write),
+      .o_data (wb_rfile_data),
+      .o_regno(wb_rfile_regno)
   );
 
 endmodule

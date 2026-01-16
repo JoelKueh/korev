@@ -15,8 +15,8 @@ module memory (
     input [31:0] i_mem_mem_forward,
 
     // Branch output.
-    input [31:0] i_exec_mem_bta,         // Branch target address.
-    input [31:0] i_exec_mem_brnch_taken, // Will we take the branch?
+    input [31:0] i_exec_mem_bta,          // Branch target address.
+    input [31:0] i_exec_mem_branch_taken, // Will we take the branch?
 
     // Control signals.
     input i_exec_mem_writeback,
@@ -26,7 +26,6 @@ module memory (
     input i_exec_mem_mem_rdu,   // Unsigned memory read?
     input i_exec_mem_mem_byte,  // Byte op size?
     input i_exec_mem_mem_hwrd,  // Halfword op size?
-    input i_exec_mem_mem_wrd,   // Word op size?
 
     // Execute alu outputs.
     input [31:0] i_exec_mem_alu_result,  // Result of the alu.
