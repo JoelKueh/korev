@@ -15,6 +15,9 @@ module fetch (
     output wire [31:0] o_newpc             // The new pc.
 );
 
+  // TODO: What about forwarding and stall logic?
+  // TODO: What about branch stalls?
+
   // The PC holds the value of the next instruction to be executed.
   assign imem_addr = pc;
   assign newpc = pc + 1;
