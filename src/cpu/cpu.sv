@@ -41,7 +41,7 @@ module cpu (
   wire [5:0] dec_rs1_no;
   wire [5:0] dec_rs2_no;
   wire [5:0] dec_rs1_dat;
-  wire [5:0] dec_rs1_dat;
+  wire [5:0] dec_rs2_dat;
 
   wire [5:0] dec_exec_rs1;
   wire [5:0] dec_exec_rs2;
@@ -68,13 +68,13 @@ module cpu (
   decode inst_decode (
       .i_clk(i_clk),
 
-      .i_fetch_dec_isntr(fetch_dec_instr),
+      .i_fetch_dec_instr(fetch_dec_instr),
       .i_fetch_dec_pc(fetch_dec_pc),
 
       .o_rs1_no (dec_rs1_no),
       .o_rs2_no (dec_rs2_no),
-      .o_rs1_dat(dec_rs1_dat),
-      .o_rs2_dat(dec_rs2_dat),
+      .i_rs1_dat(dec_rs1_dat),
+      .i_rs2_dat(dec_rs2_dat),
 
       .b_dec_exec_rs1(dec_exec_rs1),
       .b_dec_exec_rs2(dec_exec_rs2),
@@ -110,8 +110,6 @@ module cpu (
   // EXECUTE STAGE
   wire [5:0] exec_mem_rs1;
   wire [5:0] exec_mem_rs2;
-  wire [5:0] exec_mem_rd;
-
   wire [31:0] exec_mem_bta;
   wire exec_mem_branch_taken;
 
@@ -187,20 +185,19 @@ module cpu (
   wire mem_dmem_rdu;
   wire mem_dmem_byte;
   wire mem_dmem_hwrd;
-  wire mem_dmem_rdata;
+  wire [31:0] mem_dmem_rdata;
 
-  wire mem_wb_writeback;
-  wire mem_wb_mem_addr;
-  wire mem_wb_mem_data;
-  wire mem_wb_wb_data;
-  wire mem_wb_rd;
+  wire        mem_wb_writeback;
+  wire [31:0] mem_wb_mem_addr;
+  wire [31:0] mem_wb_mem_data;
+  wire [ 5:0] mem_wb_wb_data;
   memory inst_memory (
       .i_clk(i_clk),
 
       .i_exec_mem_rs1(exec_mem_rs1),
       .i_exec_mem_rs2(exec_mem_rs2),
       .i_exec_mem_rd(exec_mem_rd),
-      .i_exec_mem_wb_rd(mem_wb_rd),
+      .i_mem_wb_rd(mem_wb_rd),
 
       .i_mem_mem_forward(mem_mem_forward),
 
@@ -252,6 +249,39 @@ module cpu (
       .o_write(wb_rfile_write),
       .o_data (wb_rfile_data),
       .o_regno(wb_rfile_regno)
+  );
+
+  //
+  // Components
+  // 
+
+  // MEMORY
+  mem inst_mem (
+      .i_clk(i_clk),
+
+      .i_imem_addr(fetch_imem_addr),
+      .b_imem_rdata(fetch_imem_rdata),
+
+      .i_dmem_write(mem_dmem_write),
+      .i_dmem_byte(mem_dmem_byte),
+      .i_dmem_hwrd(mem_dmem_hwrd),
+      .i_dmem_addr(mem_dmem_addr),
+      .i_dmem_wdata(mem_dmem_wdata),
+      .b_dmem_rdata(mem_dmem_rdata)
+  );
+
+  // REGISTER FILE
+  rfile inst_rfile (
+      .i_clk(i_clk),
+
+      .i_rd_dat(wb_rfile_data),
+      .i_rd_no(wb_rfile_regno),
+      .i_write(wb_rfile_write),
+
+      .i_rs1_no(dec_rs1_no),
+      .i_rs2_no(dec_rs2_no),
+      .b_rs1_dat(dec_rs1_dat),
+      .b_rs2_dat(dec_rs2_dat)
   );
 
 endmodule

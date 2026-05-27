@@ -8,6 +8,7 @@ Kore-V is a five stage RV32I softcore designed for an FPGA.
 1. Fetch Stage
   - Attached to the memory interface.
   - Loads each instruction and updates the PC.
+  - Still need to implement stall logic.
 
 ```systemverilog
 module fetch (
@@ -24,3 +25,6 @@ module fetch (
     output wire [31:0] o_newpc             // The new pc.
 );
 ```
+
+2. Decode Stage
+  - Uses massive switch case to decode all supported instructions.

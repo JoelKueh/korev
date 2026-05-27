@@ -1,0 +1,4 @@
+-v /mnt/LinuxExtern/src/repos/korev/src/cpu/decode.sv
+-v /mnt/LinuxExtern/src/repos/korev/tb/rvvi.sv
++incdir+/mnt/LinuxExtern/src/repos/korev/src/cpu
++incdir+/mnt/LinuxExtern/src/repos/korev/src/cpu

@@ -25,7 +25,7 @@ module mem #(
     input wire i_dmem_hwrd,
     input wire [31:0] i_dmem_addr,
     input wire [31:0] i_dmem_wdata,
-    output wire [31:0] o_dmem_result
+    output wire [31:0] b_dmem_rdata
 );
 
   // Declare memory
@@ -58,7 +58,7 @@ module mem #(
       if (bwe[2]) memory[i_dmem_addr>>2][23:16] <= i_dmem_wdata[23:16];
       if (bwe[3]) memory[i_dmem_addr>>2][31:24] <= i_dmem_wdata[31:24];
     end else begin
-      dmem_rdata <= memory[i_dmem_addr>>2];
+      b_dmem_rdata <= memory[i_dmem_addr>>2];
     end
   end
 

@@ -38,7 +38,7 @@ module rfile (
   // Handle regfile writes
   always_ff @(posedge clk) begin
     if (write) begin
-      regs[regno_w] <= regdata_w;
+      regs[i_rd_no] <= i_rd_dat;
     end
   end
 
