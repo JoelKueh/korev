@@ -2,3 +2,7 @@ obj_dir/
 bin/
 instructions.ods
 tb/*/output/*
+.cache/
+compile_commands.json
+spike-install/
+libvi_reference_spike.so
