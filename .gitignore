@@ -6,3 +6,4 @@ tb/*/output/*
 compile_commands.json
 spike-install/
 libvi_reference_spike.so
+cases/obj/
