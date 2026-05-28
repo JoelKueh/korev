@@ -1,42 +1,35 @@
 
-SPIKE_SRC_DIR = $(CURDIR)/riscv-isa-sim
-SPIKE_BUILD_DIR = $(CURDIR)/riscv-isa-sim/build
-INSTALL_DIR = $(CURDIR)/install
-BUILD_DIR = $(CIRDIR)/build
+ROOT_DIR      := $(CURDIR)
+SPIKE_SRC     := $(ROOT_DIR)/riscv-isa-sim
+BUILD_DIR     := $(ROOT_DIR)/build
+INSTALL_DIR   := $(ROOT_DIR)/install
 
-.PHONY: build_spike
-build_spike:
-	mkdir -p $(SPIKE_BUILD_DIR)
-	mkdir -p $(INSTALL_DIR)
+WRAPPER_SRC   := $(ROOT_DIR)/src/spike-rvvi.cpp
+WRAPPER_SO    := $(INSTALL_DIR)/lib/librvvi_spike.so
 
-	pushd $(SPIKE_BUILD_DIR)
-	$(SPIKE_SRC_DIR)/configure \
-		--prefix=$(INSTALL_DIR) \
-		--enable-static \
-		--disable-shared
-	popd
+INCLUDES      := -I$(INSTALL_DIR)/include -I$(ROOT_DIR)/include
+SPIKE_LIBS    := -L$(INSTALL_DIR)/lib -lriscv -lfesvr -ldisasm -lsoftfloat
 
-	make -C $(SPIKE_BUILD_DIR) -j$(shell nproc)
-	make -C $(SPIKE_BUILD_DIR) install
+CXX           := g++
+CXXFLAGS      := -O2 -fPIC -std=c++14
+LDFLAGS       := -shared -Wl,-rpath,'$$ORIGIN/third_party/spike_install/lib'
 
+.PHONY: all spike rvvi clean clean_all
+all: wrapper
 
-CXX      := g++
-CXXFLAGS := -O3 -fPIC -std=c++17 \
-            -fvisibility=hidden \
-            -I$(INSTALL_DIR)/include \
-            -I$(CURDIR)/include
-LDFLAGS  := -L$(INSTALL_DIR)/lib \
-            -lriscv -lfesvr -lpthread
+spike:
+	mkdir -p $(BUILD_DIR)
+	cd $(SPIKE_SRC)/build && \
+	../configure --prefix=$(INSTALL_DIR) CFLAGS="-fPIC" CXXFLAGS="-fPIC" && \
+	make -j$(nproc) && \
+	make install
 
+rvvi: $(WRAPPER_SRC)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(WRAPPER_SRC) -o $(WRAPPER_SO) $(SPIKE_LIBS) $(LDFLAGS) -lpthread
 
-.PHONY: spike_rvvi
-spike_rvvi:
-	$(CXX) $(CXXFLAGS) spike-rvvi/spike-rvvi.cc -shared $(LDFLAGS) -o $(BUILD_DIR)/spike_rvvi.so
-
-.PHONY: spike_test
-spike_test: 
-	$(CXX) $(CXXFLAGS) spike-rvvi/spike-rvvi-test.cc -L$(BUILD_DIR) -lspike_rvvi -$(LDFLAGS) -o spike_test
-
-.PHONY: clean
 clean:
-	rm -rf $(SPIKE_BUILD_DIR) $(INSTALL_DIR)
+	rm -f $(WRAPPER_SO)
+
+clean_all: clean
+	rm -rf $(INSTALL_DIR)
+	rm -rf $(BUILD_DIR)
