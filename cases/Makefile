@@ -13,9 +13,10 @@ LDFLAGS       := -m elf32lriscv -T ./korev.ld
 OBJCOPYFLAGS  := -O verilog
 
 SRCS  := $(wildcard $(SRC_DIR)/*.s)
+ELFS  := $(patsubst $(SRC_DIR)/%.s, $(OBJ_DIR)/%.elf, $(SRCS))
 VHXS  := $(patsubst $(SRC_DIR)/%.s, $(OBJ_DIR)/%.vhx, $(SRCS))
 
-all: $(VHXS)
+all: $(ELFS) $(VHXS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	@mkdir -p $(OBJ_DIR)

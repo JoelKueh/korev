@@ -3,8 +3,6 @@
 #include <riscv/sim.h>
 #include <fesvr/elfloader.h>
 
-#define EXPORT_API __attribute__((visibility("default")))
-
 #define MEM_BASE 0x0
 #define MEM_SIZE 0x8000
 #define ENTRYPOINT 0x0
@@ -31,13 +29,16 @@ static std::vector<std::pair<reg_t, abstract_mem_t*>> make_mems(const std::vecto
 
 extern "C" {
 
-EXPORT_API bool_t rvviVersionCheck(uint32_t version)
+bool_t rvviVersionCheck(uint32_t version)
 {
 	return RVVI_API_VERSION == version ? RVVI_TRUE : RVVI_FALSE;
 }
 
-EXPORT_API bool_t rvviRefInit(const char *programPath)
+bool_t rvviRefInit(const char *programPath)
 {
+    // TODO: Remove
+    std::cerr << "Test 0" << std::endl;
+
 	// Initialize the configuration for the simulator
 	cfg_t *cfg = new cfg_t();
     cfg->initrd_bounds      = std::make_pair(0, 0); // Do not load a filesystem
@@ -56,6 +57,9 @@ EXPORT_API bool_t rvviRefInit(const char *programPath)
     cfg->cache_blocksz      = 64;                   // Default standard cache line sizing
     cfg->external_simulator = std::nullopt;         // No external simulator
 
+    // TODO: Remove
+    std::cerr << "Test 1" << std::endl;
+
     // Set up parameters for the simulator
     bool halted = false;                // CPU is not halted
     std::vector<std::pair<reg_t, abstract_mem_t*>> mems = make_mems(cfg->mem_layout);
@@ -70,6 +74,9 @@ EXPORT_API bool_t rvviRefInit(const char *programPath)
     FILE *cmd_file = nullptr;           // No command file
     std::optional<unsigned long long> instruction_limit = std::nullopt;
 
+    // TODO: Remove
+    std::cerr << "Test 2" << std::endl;
+
     // Initialize the simulator itself
     spike_sim = new sim_t(
     	cfg, halted, mems, plugin_device_factories, dtb_discovery,
@@ -77,10 +84,16 @@ EXPORT_API bool_t rvviRefInit(const char *programPath)
     	socket_enabled, cmd_file, instruction_limit
     );
 
+    // TODO: Remove
+    std::cerr << "Test 3" << std::endl;
+
 	// Load the elf file
 	if (programPath != nullptr) {
 		std::ifstream file(programPath, std::ios::binary | std::ios::ate);
 		reg_t entry_point = 0;
+
+    // TODO: Remove
+    std::cerr << "Test 4" << std::endl;
 
 		// Load the elf from the file
 		try {
@@ -95,6 +108,9 @@ EXPORT_API bool_t rvviRefInit(const char *programPath)
 			std::streamsize size = file.tellg();
 		}
 	}
+
+    // TODO: Remove
+    std::cerr << "Test 5" << std::endl;
 
 	return RVVI_TRUE;
 }
