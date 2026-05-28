@@ -25,7 +25,7 @@ struct DutState {
 } dutState;
 
 pid_t spike_pid;
-int spike_cmd;
+int spike_input[2];
 int spike_log;
 
 ls_bool_t spikeStep()
@@ -33,10 +33,10 @@ ls_bool_t spikeStep()
 	const char STEP_CMD[] = "r 1\n";
 	char buffer[256];
 
-	if (write(spike_cmd, STEP_CMD, strlen(STEP_CMD))) {
-		perror("write");
-		return LS_FALSE;
-	}
+	for (int i = 0; i < 4096; i++)
+		write(spike_input[1], STEP_CMD, strlen(STEP_CMD));
+	read(spike_log, buffer, 1);
+	std::cout << buffer[0] << std::endl;
 
 	return LS_TRUE;
 }
@@ -51,9 +51,7 @@ uint64_t spikeGetGpr(int regId)
 ls_bool_t spikeInit(const char *programPath)
 {
 	ls_bool_t result = LS_TRUE;
-	char cmd_file[] = "/tmp/spike_cmd.fifo";
 	char log_file[] = "/tmp/spike_log.fifo";
-	char cmd_arg[] = "--debug-cmd=/tmp/spike_cmd.fifo";
 	char log_arg[] = "--log=/tmp/spike_log.fifo";
 
 	// TODO: Figure out where this should go.
@@ -61,7 +59,7 @@ ls_bool_t spikeInit(const char *programPath)
 		dutState.gpr_written[i] = false;
 
 	// Create pipes to communicate with the spike simulator
-	mkfifo(cmd_file, 0666);
+	pipe(spike_input);
 	mkfifo(log_file, 0666);
 
 	// Fork and exec the spike simulator
@@ -74,7 +72,6 @@ ls_bool_t spikeInit(const char *programPath)
 	if (spike_pid == 0) {
 		char *const spike_args[] = {
 			(char *const)"spike",
-			(char *const)cmd_arg,
 			(char *const)log_arg,
 			(char *const)"-d",
 			(char *const)"-m" TOSTR(MEM_BASE) ":" TOSTR(MEM_SIZE),
@@ -91,10 +88,10 @@ ls_bool_t spikeInit(const char *programPath)
 		std::cout << std::endl;
 
 		// TODO: Figure this out
-		int fd = open("/dev/null", O_WRONLY);
-		dup2(fd, STDOUT_FILENO);
-		dup2(fd, STDERR_FILENO);
-		close(fd);
+		// int fd = open("/dev/null", O_WRONLY);
+		// dup2(fd, STDOUT_FILENO);
+		dup2(spike_input[0], STDERR_FILENO);
+		// close(fd);
 
 		// Run the spike simulator
 
@@ -105,20 +102,20 @@ ls_bool_t spikeInit(const char *programPath)
 
 	// Open the FIFOS
 	std::cout << "Test 1" << std::endl;
-	spike_cmd = open(cmd_file, O_RDWR);
+	close(spike_input[0]);
 	std::cout << "Test 2" << std::endl;
 	spike_log = open(log_file, O_RDONLY);
 
 	// TODO: Figure out
-	char buf[256];
-	read(spike_log, buf, 256);
-	perror("read");
+	// char buf[256];
+	// read(spike_log, buf, 256);
+	// perror("read");
 	std::cout << "Test 3" << std::endl;
 
 	goto out;
 
 err_close:
-	close(spike_cmd);
+	close(spike_input[1]);
 	close(spike_log);
 
 err_kill:
